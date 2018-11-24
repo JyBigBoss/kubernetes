@@ -1,0 +1,30 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: slapd
+data:
+  slapd.conf: |
+    include		/etc/openldap/schema/core.schema
+
+    pidfile		/run/openldap/slapd.pid
+    argsfile	/run/openldap/slapd.args
+
+    modulepath	/usr/lib/openldap
+    moduleload	back_mdb.so
+
+    database	mdb
+    maxsize		1073741824
+    suffix		"dc=aworld,dc=cn"
+    rootdn		"cn=admin,dc=aworld,dc=cn"
+
+    rootpw		{SSHA}3yM8/PiVcjWfoAdo3ZawilYKu/cY9PEY
+
+    directory /var/lib/ldap
+
+    index	objectClass	eq
+
+    include /etc/openldap/schema/cosine.schema
+    include /etc/openldap/schema/inetorgperson.schema
+    include /etc/openldap/schema/nis.schema
+    include /etc/openldap/schema/samba.schema

@@ -1,0 +1,20 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ldap
+spec:
+  selector:
+    app: ldap
+  type: NodePort
+  ports: 
+  - name: lam-web
+    port: 80
+    nodePort: 31111
+    targetPort: 80
+    protocol: TCP
+  - name: ldap
+    port: 389
+    nodePort: 31110
+    targetPort: 389
+    protocol: TCP

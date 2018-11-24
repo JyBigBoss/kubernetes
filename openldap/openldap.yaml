@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ldap
+  labels:
+    app: ldap
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ldap
+  template:
+    metadata:
+      labels:
+        app: ldap
+    spec:
+      containers:
+        - name: ldap
+          image: mwaeckerlin/openldap
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: openldap
+              containerPort: 389
+              #hostPort: 389
+          env:
+            - name: DOMAIN
+              value: "lotbrick.com"
+            - name: ORGANIZATION
+              value: "lotbrick"   
+            - name: PASSWORD
+              value: "admin"
+            - name: DEBUG_LEVEL
+              value: "0"
+          volumeMounts:
+            - name: ldap-data
+              mountPath: /var/lib/ldap
+            #- name: ldap-conf
+            #  mountPath: /etc/ldap
+            - name: ldap-buckup
+              mountPath: /var/backups
+              
+        - name: lam
+          image: mwaeckerlin/lam
+          imagePullPolicy: IfNotPresent
+          #lifecycle:
+          #  postStart:
+          #    exec:
+          #      command:
+          #        - "sh"
+          #        - "-c"
+          #        - cp /tmp/lam/* /var/lib/ldap-account-manager/config/
+
+          ports:
+            - name: lam
+              containerPort: 80
+          #volumeMounts:
+          #  - name: lam-conf
+          #    mountPath: /tmp/lam/
+               
+      volumes:
+        #- name: lam-conf
+        #  configMap:        
+        #    name: lam
+        - name: ldap-conf
+          configMap:
+            name: slapd
+        - name: ldap-buckup
+          persistentVolumeClaim:
+            claimName: ldap-buckup
+        - name: ldap-data
+          persistentVolumeClaim:
+            claimName: ldap-data
+                
+                
+                
+
